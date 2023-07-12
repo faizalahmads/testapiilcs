@@ -9,7 +9,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.Spinner;
+import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -25,13 +25,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
     AutoCompleteTextView actv_negara, actv_pelabuhan, actv_barang;
+    EditText inputHarga, totalHarga;
 
     String urlNegara = "https://insw-dev.ilcs.co.id/n/negara?ur_negara";
     String urlPelabuhan = "https://insw-dev.ilcs.co.id/n/pelabuhan";
@@ -58,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
         actv_negara = findViewById(R.id.actv_negara);
         actv_pelabuhan = findViewById(R.id.actv_pelabuhan);
         actv_barang = findViewById(R.id.actv_barang);
+        inputHarga = findViewById(R.id.inputharga);
+        totalHarga = findViewById(R.id.totalharga);
 
         setupAutoCompleteTextViews();
         showData();
@@ -109,6 +110,21 @@ public class MainActivity extends AppCompatActivity {
                 if (charSequence.length() >= 1) {
                     autoSuggestBarang(charSequence.toString());
                 }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
+        });
+
+        inputHarga.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                calculateTotalPrice();
             }
 
             @Override
@@ -232,6 +248,18 @@ public class MainActivity extends AppCompatActivity {
 
         RequestQueue requestQueue = Volley.newRequestQueue(context);
         requestQueue.add(stringRequest);
+    }
+
+    private void calculateTotalPrice() {
+        String hargaString = inputHarga.getText().toString().trim();
+        if (!hargaString.isEmpty()) {
+            double harga = Double.parseDouble(hargaString);
+            double tarif = 0.1;
+            double total = harga + (harga * tarif);
+            totalHarga.setText(String.valueOf(total));
+        } else {
+            totalHarga.setText("");
+        }
     }
 
     private void showData() {
